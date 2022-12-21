@@ -15,12 +15,26 @@ a {
   box-sizing: border-box;
 }
 
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
-  body {
-    color: white;
-    background: black;
-  }
+.main_container {
+  margin: 5em 10em;
+  padding: 0 4%;
+}
+
+/* home page */
+.article_container {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  width: 100%;
+  background-color: rgb(219, 214, 214);
+  margin-bottom: 2em;
+  padding: 0.5em;
+}
+
+.flex_container {
+  display: flex;
+}
+.secondry_container {
+  display: flex;
+  flex-direction: column;
 }
