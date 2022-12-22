@@ -1,0 +1,30 @@
+.article_primary_container {
+  background-color: rgb(219, 214, 214);
+  padding: 0.5rem;
+}
+.article_number_container {
+  display: none;
+}
+.article_tertiary_container {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+.tertiary_container_children {
+  width: 30%;
+}
+
+@media only screen and (min-width: 600px) {
+  .article_primary_container {
+    display: flex;
+    justify-content: start;
+  }
+  .article_number_container {
+    display: block;
+    width: 5%;
+  }
+
+  .styles.article_secondary_container {
+    width: 95%;
+  }
+}
