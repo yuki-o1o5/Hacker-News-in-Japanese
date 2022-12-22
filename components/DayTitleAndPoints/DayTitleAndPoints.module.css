@@ -1,0 +1,13 @@
+.dayTitleAndPoints {
+  display: flex;
+  justify-content: flex-start;
+  width: 100%;
+}
+
+.dayTitle {
+  width: 80%;
+}
+
+.dayPoints {
+  width: 20%;
+}

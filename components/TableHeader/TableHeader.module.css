@@ -1,0 +1,15 @@
+.tableHeader {
+  display: flex;
+  justify-content: flex-start;
+  width: 100%;
+}
+
+.tableTitle {
+  width: 80%;
+  font-weight: bold;
+}
+
+.tablePoints {
+  width: 20%;
+  font-weight: bold;
+}
