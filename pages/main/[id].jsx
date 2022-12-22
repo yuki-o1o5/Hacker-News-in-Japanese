@@ -7,12 +7,8 @@ import DetailArticleTitle from "../../components/DetailArticleTitle/DetailArticl
 import PageTitle from "../../components/PageTitle/PageTitle.jsx";
 
 const DetailPage = () => {
-  const router = useRouter();
-  const id = router.query.id;
-
   return (
     <div>
-      <p>post:{id}</p>
       <PageTitle />
       <div className={"main_container"}>
         <div className="detail_article_title_container">
