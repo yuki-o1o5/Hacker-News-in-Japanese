@@ -23,8 +23,39 @@ export async function getStaticProps() {
     topstories.map((topstory) => getDetailUrl(topstory))
   );
 
+  //  3.This is each Japanese story details
+  const translateToJapanese = async (text) => {
+    const deepl = require("deepl-node");
+    const authKey = process.env.DEEPL_AUTH_KEY;
+    const translator = new deepl.Translator(authKey);
+
+    const translatedResponse = await translator.translateText(
+      text.title,
+      null,
+      "ja"
+    );
+
+    console.log(translatedResponse.text);
+
+    return {
+      by: text.by,
+      descendants: text.descendants,
+      id: text.id,
+      kids: text.kids || [],
+      score: text.score,
+      time: text.time,
+      title: translatedResponse.text,
+      type: text.type,
+      url: text.url,
+    };
+  };
+
+  const japaneseStories = await Promise.all(
+    stories.map((story) => translateToJapanese(story))
+  );
+
   return {
-    props: { stories },
+    props: { japaneseStories },
     revalidate: 10,
   };
 }
@@ -36,15 +67,15 @@ const Mainpage = (props) => {
       <div className={"main_container"}>
         <ArticlesCategoryTitle articlesCategoryTitle={"Recent in Hour"} />
 
-        {props.stories.map((story, i) => (
+        {props.japaneseStories.map((japaneseStory, i) => (
           <Article
-            key={`story-list-${i}`}
-            id={story.id}
-            articleTitle={story.title}
+            key={`japaneseStory-list-${i}`}
+            id={japaneseStory.id}
+            articleTitle={japaneseStory.title}
             articleNumber={i + 1}
-            articleAuthor={story.by}
-            articleTime={story.time}
-            articlePoints={story.score}
+            articleAuthor={japaneseStory.by}
+            articleTime={japaneseStory.time}
+            articlePoints={japaneseStory.score}
           />
         ))}
 
