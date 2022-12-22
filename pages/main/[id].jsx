@@ -42,20 +42,88 @@ export async function getStaticProps(context) {
       topComment.kids.map((topCommentKid) => getCommentUrl(topCommentKid))
     );
   }
-  console.log("topCommentReplies", topCommentReplies);
+  // console.log("topCommentReplies", topCommentReplies);
+
+  // 4. This is Japanese title
+  const translateToJapaneseTitle = async (text) => {
+    const deepl = require("deepl-node");
+    const authKey = process.env.DEEPL_AUTH_KEY;
+    const translator = new deepl.Translator(authKey);
+    const translatedResponse = await translator.translateText(
+      text.title,
+      null,
+      "ja"
+    );
+    console.log(translatedResponse.text);
+    return {
+      by: text.by,
+      descendants: text.descendants,
+      id: text.id,
+      kids: text.kids || [],
+      score: text.score,
+      time: text.time,
+      title: translatedResponse.text,
+      type: text.type,
+      url: text.url,
+    };
+  };
+
+  const japaneseStory = await translateToJapaneseTitle(story);
+
+  const translateToJapaneseTopComment = async (text) => {
+    const deepl = require("deepl-node");
+    const authKey = process.env.DEEPL_AUTH_KEY;
+    const translator = new deepl.Translator(authKey);
+    const translatedResponse = await translator.translateText(
+      text.text,
+      null,
+      "ja"
+    );
+    console.log(translatedResponse.text);
+    return {
+      by: text.by,
+      id: text.id,
+      kids: text.kids || [],
+      parent: text.parent,
+      text: translatedResponse.text,
+      time: text.id,
+      type: text.type,
+    };
+  };
+
+  const japaneseTopComment = topComment
+    ? await translateToJapaneseTopComment(topComment)
+    : "";
+
+  // const japaneseTopCommentReplies = topCommentReplies
+  //   ? await Promise.all(
+  //       topCommentReplies.map((topCommentReply) =>
+  //         translateToJapaneseTopComment(topCommentReply)
+  //       )
+  //     )
+  //   : "";
+
+  let japaneseTopCommentReplies = [];
+  if (topCommentReplies) {
+    japaneseTopCommentReplies = await Promise.all(
+      topCommentReplies.map((topCommentReply) =>
+        translateToJapaneseTopComment(topCommentReply)
+      )
+    );
+  }
 
   return {
-    props: { story, topComment, topCommentReplies },
+    props: { japaneseStory, japaneseTopComment, japaneseTopCommentReplies },
     revalidate: 10,
   };
 }
 
 export async function getStaticPaths() {
   // 1.This is top 3 story ids.
-  const resOne = await fetch(
+  const res = await fetch(
     `https://hacker-news.firebaseio.com/v0/topstories.json?print=pretty&limitToFirst=3&orderBy="$key"`
   );
-  const topstories = await resOne.json();
+  const topstories = await res.json();
 
   const paths = topstories.map((topstory) => ({
     params: { id: topstory.toString() },
@@ -67,14 +135,18 @@ export async function getStaticPaths() {
   };
 }
 
-const DetailPage = ({ story, topComment, topCommentReplies }) => {
+const DetailPage = ({
+  japaneseStory,
+  japaneseTopComment,
+  japaneseTopCommentReplies,
+}) => {
   // console.log(story);
   return (
     <div>
       <PageTitle />
       <div className={"main_container"}>
         <div className="detail_article_title_container">
-          <DetailArticleTitle detailArticleTitle={story.title} />
+          <DetailArticleTitle detailArticleTitle={japaneseStory.title} />
         </div>
         <div className="article_text_container">
           <DetailArticleCategoryTitle
@@ -94,11 +166,11 @@ const DetailPage = ({ story, topComment, topCommentReplies }) => {
           />
           <div className="secondry_text-container">
             <DetailArticleCommentParent
-              detailArticleCommentParent={topComment.text}
+              detailArticleCommentParent={japaneseTopComment.text}
             />
-            {topCommentReplies.map((topCommentReply, i) => (
+            {japaneseTopCommentReplies.map((japaneseTopCommentReply, i) => (
               <DetailArticleCommentChild
-                detailArticleCommentChild={topCommentReply.text}
+                detailArticleCommentChild={japaneseTopCommentReply.text}
                 key={`story-list-${i}`}
               />
             ))}
