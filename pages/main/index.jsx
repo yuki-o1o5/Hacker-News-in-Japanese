@@ -39,7 +39,7 @@ export async function getStaticProps() {
 
     return {
       by: text.by,
-      descendants: text.descendants,
+      descendants: text.descendants || [],
       id: text.id,
       kids: text.kids || [],
       score: text.score,

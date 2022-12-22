@@ -56,7 +56,7 @@ export async function getStaticProps(context) {
     console.log(translatedResponse.text);
     return {
       by: text.by,
-      descendants: text.descendants,
+      descendants: text.descendants || [],
       id: text.id,
       kids: text.kids || [],
       score: text.score,
