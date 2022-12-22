@@ -39,6 +39,7 @@ const Allpage = (props) => {
             key={`story-list-${i}`}
             dayTitle={story.title}
             dayPoints={story.score}
+            id={story.id}
           />
         ))}
       </div>

@@ -39,6 +39,7 @@ const Mainpage = (props) => {
         {props.stories.map((story, i) => (
           <Article
             key={`story-list-${i}`}
+            id={story.id}
             articleTitle={story.title}
             articleNumber={i + 1}
             articleAuthor={story.by}
