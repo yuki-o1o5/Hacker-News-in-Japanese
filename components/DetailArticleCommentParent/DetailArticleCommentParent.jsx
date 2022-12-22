@@ -1,7 +1,12 @@
 import styles from "./DetailArticleCommentParent.module.css";
 
 const DetailArticleCommentParent = (props) => {
-  return <p className={styles.detailArticleCommentParent}>{props.detailArticleCommentParent}</p>;
+  return (
+    <div
+      className={styles.detailArticleCommentParent}
+      dangerouslySetInnerHTML={{ __html: props.detailArticleCommentParent }}
+    />
+  );
 };
 
 export default DetailArticleCommentParent;
