@@ -1,9 +1,11 @@
+import * as deepl from "deepl-node";
 import DetailArticleCategoryTitle from "../../components/DetailArticleCategoryTitle/DetailArticleCategoryTitle.jsx";
 import DetailArticleCommentChild from "../../components/DetailArticleCommentChild/DetailArticleCommentChild.jsx";
 import DetailArticleCommentParent from "../../components/DetailArticleCommentParent/DetailArticleCommentParent.jsx";
 import DetailArticleText from "../../components/DetailArticleText/DetailArticleText.jsx";
 import DetailArticleTitle from "../../components/DetailArticleTitle/DetailArticleTitle.jsx";
 import PageTitle from "../../components/PageTitle/PageTitle.jsx";
+import { textResultToStory } from "../../helpers/deepl";
 
 export async function getStaticProps(context) {
   // 1.This is an id. ->[33935566]
@@ -11,28 +13,59 @@ export async function getStaticProps(context) {
   // console.log("params", context.params);
 
   // 2.This is a story detail. ->{...}
-  const getDetailUrl = async (id) => {
-    const detail = await fetch(
-      `https://hacker-news.firebaseio.com/v0/item/${id}.json?print=pretty`
-    );
-    const eachStoryDetails = await detail.json();
-    return eachStoryDetails;
+  const getStoryUrl = async (id) => {
+    let story = {};
+    try {
+      const getStoryRes = await fetch(
+        `https://hacker-news.firebaseio.com/v0/item/${id}.json?print=pretty`
+      );
+
+      if (!getStoryRes.ok) {
+        return {
+          notFound: true,
+          revalidate: 10,
+        };
+      }
+      story = await getStoryRes.json();
+      return story;
+    } catch (error) {
+      return {
+        notFound: true,
+        revalidate: 10,
+      };
+    }
   };
-  const story = await getDetailUrl(storyId);
+  const storyDetail = await getStoryUrl(storyId);
 
   // 3.This is the top comment.
   const getCommentUrl = async (commentId) => {
-    const res = await fetch(
-      `https://hacker-news.firebaseio.com/v0/item/${commentId}.json?print=pretty`
-    );
-    const comments = await res.json();
-    return comments;
+    let comment = {};
+    try {
+      const getCommentRes = await fetch(
+        `https://hacker-news.firebaseio.com/v0/item/${commentId}.json?print=pretty`
+      );
+      if (!getCommentRes.ok) {
+        return {
+          notFound: true,
+          revalidate: 10,
+        };
+      }
+      comment = await getCommentRes.json();
+      return comment;
+    } catch (error) {
+      return {
+        notFound: true,
+        revalidate: 10,
+      };
+    }
   };
 
-  // 3.This is the comments of the top comment .
-  const topComment = story.kids ? await getCommentUrl(story.kids[0]) : "";
+  const topComment = storyDetail.kids
+    ? await getCommentUrl(storyDetail.kids[0])
+    : "";
   // console.log("topComment", topComment);
 
+  // 4.This is the comments of the top comment .
   let topCommentReplies = [];
   if (topComment.kids) {
     topCommentReplies = await Promise.all(
@@ -40,11 +73,9 @@ export async function getStaticProps(context) {
     );
   }
 
-  // 4. This is Japanese title
+  // 5. This is Japanese title
   const translateToJapaneseTitle = async (text) => {
-    const deepl = require("deepl-node");
-    const authKey = process.env.DEEPL_AUTH_KEY;
-    const translator = new deepl.Translator(authKey);
+    const translator = new deepl.Translator(process.env.DEEPL_AUTH_KEY);
     const translatedResponse = await translator.translateText(
       text.title,
       null,
@@ -52,38 +83,36 @@ export async function getStaticProps(context) {
     );
 
     return {
-      by: text.by,
-      descendants: text.descendants || [],
-      id: text.id,
+      by: text.by || "",
+      descendants: text.descendants || 0,
+      id: text.id || 0,
       kids: text.kids || [],
-      score: text.score,
-      time: text.time,
-      title: translatedResponse.text,
-      type: text.type,
-      url: text.url,
+      score: text.score || 0,
+      time: text.time || 0,
+      title: translatedResponse.text || 0,
+      type: text.type || "",
+      url: text.url || "",
     };
   };
 
-  const japaneseStory = await translateToJapaneseTitle(story);
+  const japaneseStoryDetail = await translateToJapaneseTitle(storyDetail);
 
   const translateToJapaneseTopComment = async (text) => {
-    const deepl = require("deepl-node");
-    const authKey = process.env.DEEPL_AUTH_KEY;
-    const translator = new deepl.Translator(authKey);
+    const translator = new deepl.Translator(process.env.DEEPL_AUTH_KEY);
     const translatedResponse = await translator.translateText(
       text.text,
       null,
       "ja"
     );
-    console.log(translatedResponse.text);
+    // console.log(translatedResponse.text);
     return {
-      by: text.by,
-      id: text.id,
+      by: text.by || "",
+      id: text.id || 0,
       kids: text.kids || [],
-      parent: text.parent,
-      text: translatedResponse.text,
-      time: text.id,
-      type: text.type,
+      parent: text.parent || 0,
+      text: translatedResponse.text || "",
+      time: text.id || 0,
+      type: text.type || "",
     };
   };
 
@@ -109,22 +138,42 @@ export async function getStaticProps(context) {
   }
 
   return {
-    props: { japaneseStory, japaneseTopComment, japaneseTopCommentReplies },
+    props: {
+      japaneseStoryDetail,
+      japaneseTopComment,
+      japaneseTopCommentReplies,
+    },
     revalidate: 10,
   };
 }
 
 export async function getStaticPaths() {
   // 1.This is top 3 story ids.
-  const res = await fetch(
-    `https://hacker-news.firebaseio.com/v0/topstories.json?print=pretty&limitToFirst=10&orderBy="$key"`
-  );
-  const topstories = await res.json();
+  let topStoriesIds = [];
+  try {
+    const getTopStoriesIdsRes = await fetch(
+      `https://hacker-news.firebaseio.com/v0/topstories.json?print=pretty&limitToFirst=10&orderBy="$key"`
+    );
 
-  const paths = topstories.map((topstory) => ({
-    params: { id: topstory.toString() },
+    if (!getTopStoriesIdsRes.ok) {
+      return {
+        notFound: true,
+        revalidate: 10,
+      };
+    }
+
+    topStoriesIds = await getTopStoriesIdsRes.json();
+  } catch (error) {
+    return {
+      notFound: true,
+      revalidate: 10,
+    };
+  }
+
+  const paths = topStoriesIds.map((topStoriesId) => ({
+    params: { id: topStoriesId.toString() },
   }));
-  console.log(paths);
+  // console.log(paths);
   return {
     paths,
     fallback: false,
@@ -132,7 +181,7 @@ export async function getStaticPaths() {
 }
 
 const DetailPage = ({
-  japaneseStory,
+  japaneseStoryDetail,
   japaneseTopComment,
   japaneseTopCommentReplies,
 }) => {
@@ -141,7 +190,7 @@ const DetailPage = ({
       <PageTitle />
       <div className={"main_container"}>
         <div className="detail_article_title_container">
-          <DetailArticleTitle detailArticleTitle={japaneseStory.title} />
+          <DetailArticleTitle detailArticleTitle={japaneseStoryDetail.title} />
         </div>
         <div className="article_text_container">
           <DetailArticleCategoryTitle
@@ -163,10 +212,10 @@ const DetailPage = ({
             <DetailArticleCommentParent
               detailArticleCommentParent={japaneseTopComment.text}
             />
-            {japaneseTopCommentReplies.map((japaneseTopCommentReply, i) => (
+            {japaneseTopCommentReplies.map((japaneseTopCommentReply) => (
               <DetailArticleCommentChild
                 detailArticleCommentChild={japaneseTopCommentReply.text}
-                key={`story-list-${i}`}
+                key={`story-list-${japaneseTopCommentReply.id}`}
               />
             ))}
           </div>
