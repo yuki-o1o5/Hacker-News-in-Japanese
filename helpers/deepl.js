@@ -6,7 +6,7 @@ export const textResultToStory = (textResult, japaneseTextResult) => {
     kids: textResult.kids || [],
     score: textResult.score || 0,
     time: textResult.time || 0,
-    title: japaneseTextResult.title || 0,
+    title: japaneseTextResult.title || "",
     type: textResult.type || "",
     url: textResult.url || "",
   };
