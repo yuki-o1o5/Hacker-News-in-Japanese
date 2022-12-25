@@ -114,6 +114,8 @@ export async function getStaticProps(context) {
       time: text.id || 0,
       type: text.type || "",
     };
+
+    // return textResultToStory(text, translatedResponse);
   };
 
   const japaneseTopComment = topComment
