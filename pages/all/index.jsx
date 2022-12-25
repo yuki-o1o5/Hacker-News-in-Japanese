@@ -4,7 +4,7 @@ import TableHeader from "../../components/TableHeader/TableHeader.jsx";
 import DayTitleAndPoints from "../../components/DayTitleAndPoints/DayTitleAndPoints.jsx";
 
 export async function getStaticProps() {
-  // 1.This is top 3 story ids.
+  // 1.This is top 10 story ids.
   let topStoriesIds = [];
   try {
     const getTopStoriesIdsRes = await fetch(
