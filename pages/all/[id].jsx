@@ -37,6 +37,7 @@ export async function getStaticProps(context) {
     }
   };
   const storyDetail = await getStoryUrl(storyId);
+  // console.log(storyDetail);
 
   // 3.This is the top comment.
   const getCommentUrl = async (commentId) => {
@@ -82,22 +83,22 @@ export async function getStaticProps(context) {
       null,
       "ja"
     );
-
-    // return {
-    //   by: text.by || "",
-    //   descendants: text.descendants || 0,
-    //   id: text.id || 0,
-    //   kids: text.kids || [],
-    //   score: text.score || 0,
-    //   time: text.time || 0,
-    //   title: translatedResponse.text || 0,
-    //   type: text.type || "",
-    //   url: text.url || "",
-    // };
-    return textResultToStory(text, translatedResponse);
+    return {
+      by: text.by || "",
+      descendants: text.descendants || 0,
+      id: text.id || 0,
+      kids: text.kids || [],
+      score: text.score || 0,
+      time: text.time || 0,
+      title: translatedResponse.text || 0,
+      type: text.type || "",
+      url: text.url || "",
+    };
+    // return textResultToStory(text, translatedResponse);
   };
 
   const japaneseStoryDetail = await translateToJapaneseTitle(storyDetail);
+  console.log(japaneseStoryDetail);
 
   const translateToJapaneseTopComment = async (text) => {
     const translator = new deepl.Translator(process.env.DEEPL_AUTH_KEY);
@@ -123,6 +124,8 @@ export async function getStaticProps(context) {
     ? await translateToJapaneseTopComment(topComment)
     : "";
 
+  // console.log(japaneseTopComment);
+
   // const japaneseTopCommentReplies = topCommentReplies
   //   ? await Promise.all(
   //       topCommentReplies.map((topCommentReply) =>
@@ -139,6 +142,7 @@ export async function getStaticProps(context) {
       )
     );
   }
+  // console.log(japaneseTopCommentReplies);
 
   return {
     props: {
