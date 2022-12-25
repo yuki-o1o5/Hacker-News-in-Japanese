@@ -6,6 +6,7 @@ import DetailArticleText from "../../components/DetailArticleText/DetailArticleT
 import DetailArticleTitle from "../../components/DetailArticleTitle/DetailArticleTitle.jsx";
 import PageTitle from "../../components/PageTitle/PageTitle.jsx";
 import { textResultToStory } from "../../helpers/deepl";
+import { textResultToComment } from "../../helpers/deepl";
 
 export async function getStaticProps(context) {
   // 1.This is an id. ->[33935566]
@@ -82,17 +83,18 @@ export async function getStaticProps(context) {
       "ja"
     );
 
-    return {
-      by: text.by || "",
-      descendants: text.descendants || 0,
-      id: text.id || 0,
-      kids: text.kids || [],
-      score: text.score || 0,
-      time: text.time || 0,
-      title: translatedResponse.text || 0,
-      type: text.type || "",
-      url: text.url || "",
-    };
+    // return {
+    //   by: text.by || "",
+    //   descendants: text.descendants || 0,
+    //   id: text.id || 0,
+    //   kids: text.kids || [],
+    //   score: text.score || 0,
+    //   time: text.time || 0,
+    //   title: translatedResponse.text || 0,
+    //   type: text.type || "",
+    //   url: text.url || "",
+    // };
+    return textResultToStory(text, translatedResponse);
   };
 
   const japaneseStoryDetail = await translateToJapaneseTitle(storyDetail);
@@ -104,18 +106,17 @@ export async function getStaticProps(context) {
       null,
       "ja"
     );
-    // console.log(translatedResponse.text);
-    return {
-      by: text.by || "",
-      id: text.id || 0,
-      kids: text.kids || [],
-      parent: text.parent || 0,
-      text: translatedResponse.text || "",
-      time: text.id || 0,
-      type: text.type || "",
-    };
 
-    // return textResultToStory(text, translatedResponse);
+    // return {
+    //   by: text.by || "",
+    //   id: text.id || 0,
+    //   kids: text.kids || [],
+    //   parent: text.parent || 0,
+    //   text: translatedResponse.text || "",
+    //   time: text.id || 0,
+    //   type: text.type || "",
+    // };
+    return textResultToComment(text, translatedResponse);
   };
 
   const japaneseTopComment = topComment
