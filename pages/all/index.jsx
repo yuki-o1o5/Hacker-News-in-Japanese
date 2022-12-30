@@ -1,6 +1,8 @@
 import PageTitle from "../../components/PageTitle/PageTitle.jsx";
+import ArticlesCategoryTitle from "../../components/ArticlesCategoryTitle/ArticlesCategoryTitle.jsx";
 import TableHeader from "../../components/TableHeader/TableHeader.jsx";
 import DayTitleAndPoints from "../../components/DayTitleAndPoints/DayTitleAndPoints.jsx";
+import PageDescription from "../../components/PageDescription/PageDescription.jsx";
 import { getStoryDetail } from "../../helpers/hackerNews/storyDetail";
 import { translateStoryDetail } from "../../helpers/deepl/translateStoryDetail";
 import { JA } from "../../helpers/deepl/common";
@@ -42,12 +44,12 @@ export async function getStaticProps() {
   };
 }
 
-const Allpage = (props) => {
+const AllPage = (props) => {
   return (
     <div>
       <PageTitle />
       <div className={"main_container"}>
-        {/* <Date date={"December 1st"} /> */}
+        <ArticlesCategoryTitle articlesCategoryTitle={"Recent Top 10"} />
         <TableHeader />
         {props.japaneseTopStoriesDetails.map((japaneseTopStoryDetail) => (
           <DayTitleAndPoints
@@ -57,9 +59,10 @@ const Allpage = (props) => {
             id={japaneseTopStoryDetail.id}
           />
         ))}
+        <PageDescription />
       </div>
     </div>
   );
 };
 
-export default Allpage;
+export default AllPage;
