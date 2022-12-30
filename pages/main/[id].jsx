@@ -1,154 +1,65 @@
-import * as deepl from "deepl-node";
 import DetailArticleCategoryTitle from "../../components/DetailArticleCategoryTitle/DetailArticleCategoryTitle.jsx";
 import DetailArticleCommentChild from "../../components/DetailArticleCommentChild/DetailArticleCommentChild.jsx";
 import DetailArticleCommentParent from "../../components/DetailArticleCommentParent/DetailArticleCommentParent.jsx";
-import DetailArticleText from "../../components/DetailArticleText/DetailArticleText.jsx";
 import DetailArticleTitle from "../../components/DetailArticleTitle/DetailArticleTitle.jsx";
+import DetailArticleUrl from "../../components/DetailArticleUrl/DetailArticleUrl.jsx";
 import PageTitle from "../../components/PageTitle/PageTitle.jsx";
-import { textResultToStory } from "../../helpers/deepl";
+import { getStoryDetail } from "../../helpers/hackerNews/storyDetail";
+import { getCommentDetail } from "../../helpers/hackerNews/commentDetail";
+import { translateStoryDetail } from "../../helpers/deepl/translateStoryDetail";
+import { translateCommentDetail } from "../../helpers/deepl/translateCommentDetail";
+import { JA } from "../../helpers/deepl/common";
 
 export async function getStaticProps(context) {
-  // 1.This is an id. ->[33935566]
   const storyId = context.params.id;
-  // console.log("params", context.params);
+  // console.log(storyId);
 
-  // 2.This is a story detail. ->{...}
-  const getStoryUrl = async (id) => {
-    let story = {};
-    try {
-      const getStoryRes = await fetch(
-        `https://hacker-news.firebaseio.com/v0/item/${id}.json?print=pretty`
-      );
+  const storyDetail = await getStoryDetail(storyId);
+  // console.log(storyDetail);
 
-      if (!getStoryRes.ok) {
-        return {
-          notFound: true,
-          revalidate: 10,
-        };
-      }
-      story = await getStoryRes.json();
-      return story;
-    } catch (error) {
-      return {
-        notFound: true,
-        revalidate: 10,
-      };
-    }
-  };
-  const storyDetail = await getStoryUrl(storyId);
-
-  // 3.This is the top comment.
-  const getCommentUrl = async (commentId) => {
-    let comment = {};
-    try {
-      const getCommentRes = await fetch(
-        `https://hacker-news.firebaseio.com/v0/item/${commentId}.json?print=pretty`
-      );
-      if (!getCommentRes.ok) {
-        return {
-          notFound: true,
-          revalidate: 10,
-        };
-      }
-      comment = await getCommentRes.json();
-      return comment;
-    } catch (error) {
-      return {
-        notFound: true,
-        revalidate: 10,
-      };
-    }
-  };
-
-  const topComment = storyDetail.kids
-    ? await getCommentUrl(storyDetail.kids[0])
+  const firstCommentDetail = storyDetail.kids
+    ? await getCommentDetail(storyDetail.kids[0])
     : "";
-  // console.log("topComment", topComment);
+  // console.log("firstCommentDetail", firstCommentDetail);
 
-  // 4.This is the comments of the top comment .
-  let topCommentReplies = [];
-  if (topComment.kids) {
-    topCommentReplies = await Promise.all(
-      topComment.kids.map((topCommentKid) => getCommentUrl(topCommentKid))
-    );
-  }
-
-  // 5. This is Japanese title
-  const translateToJapaneseTitle = async (text) => {
-    const translator = new deepl.Translator(process.env.DEEPL_AUTH_KEY);
-    const translatedResponse = await translator.translateText(
-      text.title,
-      null,
-      "ja"
-    );
-
-    return {
-      by: text.by || "",
-      descendants: text.descendants || 0,
-      id: text.id || 0,
-      kids: text.kids || [],
-      score: text.score || 0,
-      time: text.time || 0,
-      title: translatedResponse.text || 0,
-      type: text.type || "",
-      url: text.url || "",
-    };
-  };
-
-  const japaneseStoryDetail = await translateToJapaneseTitle(storyDetail);
-
-  const translateToJapaneseTopComment = async (text) => {
-    const translator = new deepl.Translator(process.env.DEEPL_AUTH_KEY);
-    const translatedResponse = await translator.translateText(
-      text.text,
-      null,
-      "ja"
-    );
-    // console.log(translatedResponse.text);
-    return {
-      by: text.by || "",
-      id: text.id || 0,
-      kids: text.kids || [],
-      parent: text.parent || 0,
-      text: translatedResponse.text || "",
-      time: text.id || 0,
-      type: text.type || "",
-    };
-  };
-
-  const japaneseTopComment = topComment
-    ? await translateToJapaneseTopComment(topComment)
-    : "";
-
-  // const japaneseTopCommentReplies = topCommentReplies
-  //   ? await Promise.all(
-  //       topCommentReplies.map((topCommentReply) =>
-  //         translateToJapaneseTopComment(topCommentReply)
-  //       )
-  //     )
-  //   : "";
-
-  let japaneseTopCommentReplies = [];
-  if (topCommentReplies) {
-    japaneseTopCommentReplies = await Promise.all(
-      topCommentReplies.map((topCommentReply) =>
-        translateToJapaneseTopComment(topCommentReply)
+  let firstCommentReplies = [];
+  if (firstCommentDetail.kids) {
+    firstCommentReplies = await Promise.all(
+      firstCommentDetail.kids.map((firstCommentDetailKid) =>
+        getCommentDetail(firstCommentDetailKid)
       )
     );
   }
 
+  const japaneseStoryDetail = await translateStoryDetail(storyDetail, JA);
+  // console.log(japaneseStoryDetail);
+
+  const japaneseFirstCommentDetail = firstCommentDetail
+    ? await translateCommentDetail(firstCommentDetail, JA)
+    : {};
+  // console.log(japaneseFirstCommentDetail);
+
+  let japaneseFirstCommentReplies = [];
+  if (firstCommentReplies) {
+    japaneseFirstCommentReplies = await Promise.all(
+      firstCommentReplies.map((fisrtCommentReply) =>
+        translateCommentDetail(fisrtCommentReply, JA)
+      )
+    );
+  }
+  // console.log(japaneseFirstCommentReplies);
+
   return {
     props: {
       japaneseStoryDetail,
-      japaneseTopComment,
-      japaneseTopCommentReplies,
+      japaneseFirstCommentDetail,
+      japaneseFirstCommentReplies,
     },
     revalidate: 10,
   };
 }
 
 export async function getStaticPaths() {
-  // 1.This is top 3 story ids.
   let topStoriesIds = [];
   try {
     const getTopStoriesIdsRes = await fetch(
@@ -161,7 +72,6 @@ export async function getStaticPaths() {
         revalidate: 10,
       };
     }
-
     topStoriesIds = await getTopStoriesIdsRes.json();
   } catch (error) {
     return {
@@ -182,8 +92,8 @@ export async function getStaticPaths() {
 
 const DetailPage = ({
   japaneseStoryDetail,
-  japaneseTopComment,
-  japaneseTopCommentReplies,
+  japaneseFirstCommentDetail,
+  japaneseFirstCommentReplies,
 }) => {
   return (
     <div>
@@ -194,28 +104,24 @@ const DetailPage = ({
         </div>
         <div className="article_text_container">
           <DetailArticleCategoryTitle
-            detailArticleCategoryTitle={"Article Summary"}
+            detailArticleCategoryTitle={"Story URL"}
           />
           <div className="main_text-container">
-            <DetailArticleText
-              detailArticleText={
-                "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Tempor nec feugiat nisl pretium. Purus non enim praesent elementum facilisis. Ultrices sagittis orci a scelerisque purus semper eget duis. At lectus urna duis convallis convallis tellus. Gravida in fermentum et sollicitudin ac orci phasellus egestas. Ut sem nulla pharetra diam sit. Id donec ultrices tincidunt."
-              }
-            />
+            <DetailArticleUrl DetailArticleUrl={japaneseStoryDetail.url} />
           </div>
         </div>
         <div className="article_text_container">
           <DetailArticleCategoryTitle
-            detailArticleCategoryTitle={"Top Comment"}
+            detailArticleCategoryTitle={"Top Comment & Replies"}
           />
           <div className="secondry_text-container">
             <DetailArticleCommentParent
-              detailArticleCommentParent={japaneseTopComment.text}
+              detailArticleCommentParent={japaneseFirstCommentDetail.text}
             />
-            {japaneseTopCommentReplies.map((japaneseTopCommentReply) => (
+            {japaneseFirstCommentReplies.map((japaneseFirstCommentReply) => (
               <DetailArticleCommentChild
-                detailArticleCommentChild={japaneseTopCommentReply.text}
-                key={`story-list-${japaneseTopCommentReply.id}`}
+                detailArticleCommentChild={japaneseFirstCommentReply.text}
+                key={`story-list-${japaneseFirstCommentReply.id}`}
               />
             ))}
           </div>
