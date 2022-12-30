@@ -1,3 +1,8 @@
 .pageDescription {
+  margin-top: 3rem;
   font-size: 1rem;
+  color: #8d7e6f;
+}
+.pageDescription a{
+  text-decoration-line: underline;
 }
