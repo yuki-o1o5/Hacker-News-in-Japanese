@@ -1,9 +1,13 @@
+html {
+  background-color: #f2f0e0a9;
+}
+
 html,
 body {
   padding: 0;
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
-    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+  font-family: "ABeeZee", sans-serif;
+  font-family: "Questrial", sans-serif;
 }
 
 a {
