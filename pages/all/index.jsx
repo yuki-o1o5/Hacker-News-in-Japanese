@@ -31,7 +31,7 @@ export async function getStaticProps() {
     topStoriesIds.map((topStoryId) => getStoryDetail(topStoryId))
   );
 
-  //  3.This is each Japanese story details
+
   const japaneseTopStoriesDetails = await Promise.all(
     topStoriesDetails.map((topStoryDetail) =>
       translateStoryDetail(topStoryDetail, JA)
