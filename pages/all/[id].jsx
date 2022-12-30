@@ -1,8 +1,8 @@
 import DetailArticleCategoryTitle from "../../components/DetailArticleCategoryTitle/DetailArticleCategoryTitle.jsx";
 import DetailArticleCommentChild from "../../components/DetailArticleCommentChild/DetailArticleCommentChild.jsx";
 import DetailArticleCommentParent from "../../components/DetailArticleCommentParent/DetailArticleCommentParent.jsx";
-import DetailArticleText from "../../components/DetailArticleText/DetailArticleText.jsx";
 import DetailArticleTitle from "../../components/DetailArticleTitle/DetailArticleTitle.jsx";
+import DetailArticleUrl from "../../components/DetailArticleUrl/DetailArticleUrl.jsx";
 import PageTitle from "../../components/PageTitle/PageTitle.jsx";
 import { getStoryDetail } from "../../helpers/hackerNews/storyDetail";
 import { getCommentDetail } from "../../helpers/hackerNews/commentDetail";
@@ -17,19 +17,16 @@ export async function getStaticProps(context) {
   const storyDetail = await getStoryDetail(storyId);
   // console.log(storyDetail);
 
-  const commentIds = storyDetail.kids;
-
-  const firstCommentDetail =
-    0 < commentIds.length ? await getCommentDetail(commentIds[0]) : {};
+  const firstCommentDetail = storyDetail.kids
+    ? await getCommentDetail(storyDetail.kids[0])
+    : "";
   // console.log("firstCommentDetail", firstCommentDetail);
 
-  const firstCommentReplyIds = firstCommentDetail.kids;
-
   let firstCommentReplies = [];
-  if (firstCommentReplyIds) {
+  if (firstCommentDetail.kids) {
     firstCommentReplies = await Promise.all(
-      firstCommentReplyIds.map((firstCommentReplyId) =>
-        getCommentDetail(firstCommentReplyId)
+      firstCommentDetail.kids.map((firstCommentDetailKid) =>
+        getCommentDetail(firstCommentDetailKid)
       )
     );
   }
@@ -107,19 +104,15 @@ const DetailPage = ({
         </div>
         <div className="article_text_container">
           <DetailArticleCategoryTitle
-            detailArticleCategoryTitle={"Article Summary"}
+            detailArticleCategoryTitle={"Story URL"}
           />
           <div className="main_text-container">
-            <DetailArticleText
-              detailArticleText={
-                "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Tempor nec feugiat nisl pretium. Purus non enim praesent elementum facilisis. Ultrices sagittis orci a scelerisque purus semper eget duis. At lectus urna duis convallis convallis tellus. Gravida in fermentum et sollicitudin ac orci phasellus egestas. Ut sem nulla pharetra diam sit. Id donec ultrices tincidunt."
-              }
-            />
+            <DetailArticleUrl DetailArticleUrl={japaneseStoryDetail.url} />
           </div>
         </div>
         <div className="article_text_container">
           <DetailArticleCategoryTitle
-            detailArticleCategoryTitle={"Top Comment"}
+            detailArticleCategoryTitle={"Top Comment & Replies"}
           />
           <div className="secondry_text-container">
             <DetailArticleCommentParent
