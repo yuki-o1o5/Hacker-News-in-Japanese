@@ -5,7 +5,7 @@ import DayTitleAndPoints from "../../components/DayTitleAndPoints/DayTitleAndPoi
 import PageDescription from "../../components/PageDescription/PageDescription.jsx";
 import { getStoryDetail } from "../../helpers/hackerNews/storyDetail";
 import { translateStoryDetail } from "../../helpers/deepl/translateStoryDetail";
-import { JA } from "../../helpers/deepl/common";
+import { JA } from "../../constants/deepl";
 
 export async function getServerSideProps() {
   let topStoriesIds = [];

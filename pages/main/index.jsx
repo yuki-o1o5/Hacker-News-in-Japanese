@@ -4,7 +4,7 @@ import PageDescription from "../../components/PageDescription/PageDescription.js
 import PageTitle from "../../components/PageTitle/PageTitle.jsx";
 import { getStoryDetail } from "../../helpers/hackerNews/storyDetail";
 import { translateStoryDetail } from "../../helpers/deepl/translateStoryDetail";
-import { JA } from "../../helpers/deepl/common";
+import { JA } from "../../constants/deepl";
 
 export async function getServerSideProps() {
   let topStoriesIds = [];

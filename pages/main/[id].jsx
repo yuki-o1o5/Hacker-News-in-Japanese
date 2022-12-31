@@ -8,7 +8,7 @@ import { getStoryDetail } from "../../helpers/hackerNews/storyDetail";
 import { getCommentDetail } from "../../helpers/hackerNews/commentDetail";
 import { translateStoryDetail } from "../../helpers/deepl/translateStoryDetail";
 import { translateCommentDetail } from "../../helpers/deepl/translateCommentDetail";
-import { JA } from "../../helpers/deepl/common";
+import { JA } from "../../constants/deepl";
 
 export async function getServerSideProps(context) {
   const storyId = context.query.id;
@@ -75,7 +75,7 @@ const DetailPage = ({
             detailArticleCategoryTitle={"Story URL"}
           />
           <div className="main_text-container">
-            <DetailArticleUrl DetailArticleUrl={japaneseStoryDetail.url} />
+            <DetailArticleUrl detailArticleUrl={japaneseStoryDetail.url} />
           </div>
         </div>
         <div className="article_text_container">
