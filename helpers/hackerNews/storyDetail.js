@@ -8,7 +8,6 @@ export const getStoryDetail = async (id) => {
     if (!getStoryDetailRes.ok) {
       return {
         notFound: true,
-        revalidate: 10,
       };
     }
     storyDetail = await getStoryDetailRes.json();
@@ -16,7 +15,6 @@ export const getStoryDetail = async (id) => {
   } catch (error) {
     return {
       notFound: true,
-      revalidate: 10,
     };
   }
 };

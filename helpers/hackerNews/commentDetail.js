@@ -7,7 +7,6 @@ export const getCommentDetail = async (commentId) => {
     if (!getCommentDetailRes.ok) {
       return {
         notFound: true,
-        revalidate: 10,
       };
     }
     commentDetail = await getCommentDetailRes.json();
@@ -15,7 +14,6 @@ export const getCommentDetail = async (commentId) => {
   } catch (error) {
     return {
       notFound: true,
-      revalidate: 10,
     };
   }
 };
