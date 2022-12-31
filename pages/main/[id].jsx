@@ -10,8 +10,8 @@ import { translateStoryDetail } from "../../helpers/deepl/translateStoryDetail";
 import { translateCommentDetail } from "../../helpers/deepl/translateCommentDetail";
 import { JA } from "../../helpers/deepl/common";
 
-export async function getStaticProps(context) {
-  const storyId = context.params.id;
+export async function getServerSideProps(context) {
+  const storyId = context.query.id;
   // console.log(storyId);
 
   const storyDetail = await getStoryDetail(storyId);
@@ -55,38 +55,6 @@ export async function getStaticProps(context) {
       japaneseFirstCommentDetail,
       japaneseFirstCommentReplies,
     },
-    revalidate: 10,
-  };
-}
-
-export async function getStaticPaths() {
-  let topStoriesIds = [];
-  try {
-    const getTopStoriesIdsRes = await fetch(
-      `https://hacker-news.firebaseio.com/v0/topstories.json?print=pretty&limitToFirst=10&orderBy="$key"`
-    );
-
-    if (!getTopStoriesIdsRes.ok) {
-      return {
-        notFound: true,
-        revalidate: 10,
-      };
-    }
-    topStoriesIds = await getTopStoriesIdsRes.json();
-  } catch (error) {
-    return {
-      notFound: true,
-      revalidate: 10,
-    };
-  }
-
-  const paths = topStoriesIds.map((topStoriesId) => ({
-    params: { id: topStoriesId.toString() },
-  }));
-  // console.log(paths);
-  return {
-    paths,
-    fallback: false,
   };
 }
 

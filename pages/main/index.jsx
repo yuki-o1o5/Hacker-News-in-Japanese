@@ -6,7 +6,7 @@ import { getStoryDetail } from "../../helpers/hackerNews/storyDetail";
 import { translateStoryDetail } from "../../helpers/deepl/translateStoryDetail";
 import { JA } from "../../helpers/deepl/common";
 
-export async function getStaticProps() {
+export async function getServerSideProps() {
   let topStoriesIds = [];
   try {
     const getTopStoriesIdsRes = await fetch(
@@ -16,7 +16,6 @@ export async function getStaticProps() {
     if (!getTopStoriesIdsRes.ok) {
       return {
         notFound: true,
-        revalidate: 10,
       };
     }
 
@@ -24,7 +23,6 @@ export async function getStaticProps() {
   } catch (error) {
     return {
       notFound: true,
-      revalidate: 10,
     };
   }
 
@@ -40,7 +38,6 @@ export async function getStaticProps() {
 
   return {
     props: { japaneseTopStories },
-    revalidate: 10,
   };
 }
 
