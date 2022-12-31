@@ -5,7 +5,7 @@ const DetailArticleUrl = (props) => {
   return (
     <div>
       <Link href={props.DetailArticleUrl} target="_blank">
-        <div className={styles.detailArticleUrl}>{props.DetailArticleUrl}</div>
+        <div className={styles.detailArticleUrl}>{props.detailArticleUrl}</div>
       </Link>
     </div>
   );
