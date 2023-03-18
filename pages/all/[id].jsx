@@ -9,18 +9,18 @@ import { getCommentDetail } from "../../helpers/hackerNews/commentDetail";
 import { translateStoryDetail } from "../../helpers/deepl/translateStoryDetail";
 import { translateCommentDetail } from "../../helpers/deepl/translateCommentDetail";
 import { JA } from "../../constants/deepl";
+import styles from "./index.module.css";
 
 export async function getServerSideProps(context) {
   const storyId = context.query.id;
-  // console.log(storyId);
-
   const storyDetail = await getStoryDetail(storyId);
+
+  // console.log(storyId);
   // console.log(storyDetail);
 
-  const firstCommentDetail = storyDetail.kids
+  const firstCommentDetail = storyDetail.kids?.length
     ? await getCommentDetail(storyDetail.kids[0])
     : "";
-  // console.log("firstCommentDetail", firstCommentDetail);
 
   let firstCommentReplies = [];
   if (firstCommentDetail.kids) {
@@ -31,31 +31,39 @@ export async function getServerSideProps(context) {
     );
   }
 
-  const japaneseStoryDetail = await translateStoryDetail(storyDetail, JA);
-  // console.log(japaneseStoryDetail);
+  try {
+    const japaneseStoryDetail = await translateStoryDetail(storyDetail, JA);
 
-  const japaneseFirstCommentDetail = firstCommentDetail
-    ? await translateCommentDetail(firstCommentDetail, JA)
-    : {};
-  // console.log(japaneseFirstCommentDetail);
+    const japaneseFirstCommentDetail = firstCommentDetail
+      ? await translateCommentDetail(firstCommentDetail, JA)
+      : {};
 
-  let japaneseFirstCommentReplies = [];
-  if (firstCommentReplies) {
-    japaneseFirstCommentReplies = await Promise.all(
-      firstCommentReplies.map((fisrtCommentReply) =>
-        translateCommentDetail(fisrtCommentReply, JA)
-      )
-    );
+    let japaneseFirstCommentReplies = [];
+    if (firstCommentReplies) {
+      console.log(`*************************:`, firstCommentReplies);
+      japaneseFirstCommentReplies = await Promise.all(
+        firstCommentReplies.map((fisrtCommentReply) =>
+          translateCommentDetail(fisrtCommentReply, JA)
+        )
+      );
+    }
+
+    return {
+      props: {
+        japaneseStoryDetail,
+        japaneseFirstCommentDetail,
+        japaneseFirstCommentReplies,
+      },
+    };
+  } catch (e) {
+    return {
+      props: {
+        japaneseStoryDetail: {},
+        japaneseFirstCommentDetail: {},
+        japaneseFirstCommentReplies: {},
+      },
+    };
   }
-  // console.log(japaneseFirstCommentReplies);
-
-  return {
-    props: {
-      japaneseStoryDetail,
-      japaneseFirstCommentDetail,
-      japaneseFirstCommentReplies,
-    },
-  };
 }
 
 const DetailPage = ({
@@ -83,15 +91,35 @@ const DetailPage = ({
             detailArticleCategoryTitle={"Top Comment & Replies"}
           />
           <div className="secondry_text-container">
-            <DetailArticleCommentParent
-              detailArticleCommentParent={japaneseFirstCommentDetail.text}
+            <div
+              className={styles.detailArticleCommentParent}
+              dangerouslySetInnerHTML={{
+                __html: japaneseFirstCommentDetail.text,
+              }}
             />
-            {japaneseFirstCommentReplies.map((japaneseFirstCommentReply) => (
+
+            {japaneseFirstCommentReplies.map(
+              (rep) => (
+                <div
+                  key={rep.id}
+                  className={styles.detailArticleCommentChild}
+                  dangerouslySetInnerHTML={{ __html: rep.text }}
+                />
+              )
+              // console.log(japaneseFirstCommentDet.text)
+            )}
+
+            {/* <DetailArticleCommentParent
+              detailArticleCommentParent={japaneseFirstCommentDetail.text}
+            /> */}
+
+            {/* {console.log(japaneseFirstCommentReplies)} */}
+            {/* {japaneseFirstCommentReplies.map((japaneseFirstCommentReply) => (
               <DetailArticleCommentChild
                 detailArticleCommentChild={japaneseFirstCommentReply.text}
                 key={`story-list-${japaneseFirstCommentReply.id}`}
               />
-            ))}
+            ))} */}
           </div>
         </div>
       </div>
