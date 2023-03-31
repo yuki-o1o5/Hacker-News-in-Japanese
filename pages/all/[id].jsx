@@ -60,7 +60,7 @@ export async function getServerSideProps(context) {
       props: {
         japaneseStoryDetail: {},
         japaneseFirstCommentDetail: {},
-        japaneseFirstCommentReplies: {},
+        japaneseFirstCommentReplies: [],
       },
     };
   }
