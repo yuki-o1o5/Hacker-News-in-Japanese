@@ -1,50 +1,65 @@
+
 import PageTitle from "../../components/PageTitle/PageTitle.jsx";
+import ArticlesCategoryTitle from "../../components/ArticlesCategoryTitle/ArticlesCategoryTitle.jsx";
 import TableHeader from "../../components/TableHeader/TableHeader.jsx";
 import DayTitleAndPoints from "../../components/DayTitleAndPoints/DayTitleAndPoints.jsx";
+import PageDescription from "../../components/PageDescription/PageDescription.jsx";
+import { getStoryDetail } from "../../helpers/hackerNews/storyDetail";
+import { translateStoryDetail } from "../../helpers/deepl/translateStoryDetail";
+import { JA } from "../../constants/deepl";
 
-export async function getStaticProps() {
-  // 1.This is top 3 story ids.
-  const res = await fetch(
-    `https://hacker-news.firebaseio.com/v0/topstories.json?print=pretty&limitToFirst=10&orderBy="$key"`
-  );
-  const topstories = await res.json();
-
-  // 2.This is each story details.
-  const getDetailUrl = async (id) => {
-    const res = await fetch(
-      `https://hacker-news.firebaseio.com/v0/item/${id}.json?print=pretty`
+export async function getServerSideProps() {
+  let topStoriesIds = [];
+  try {
+    const getTopStoriesIdsRes = await fetch(
+      `https://hacker-news.firebaseio.com/v0/topstories.json?print=pretty&limitToFirst=10&orderBy="$key"`
     );
-    const eachStoryDetails = await res.json();
-    return eachStoryDetails;
-  };
+    if (!getTopStoriesIdsRes.ok) {
+      return {
+        notFound: true,
+      };
+    }
+    topStoriesIds = await getTopStoriesIdsRes.json();
+  } catch (error) {
+    return {
+      notFound: true,
+    };
+  }
 
-  const stories = await Promise.all(
-    topstories.map((topstory) => getDetailUrl(topstory))
+  const topStoriesDetails = await Promise.all(
+    topStoriesIds.map((topStoryId) => getStoryDetail(topStoryId))
+  );
+
+  const japaneseTopStoriesDetails = await Promise.all(
+    topStoriesDetails.map((topStoryDetail) =>
+      translateStoryDetail(topStoryDetail, JA)
+    )
   );
 
   return {
-    props: { stories },
-    revalidate: 10,
+    props: { japaneseTopStoriesDetails },
   };
 }
-const Allpage = (props) => {
+
+const AllPage = (props) => {
   return (
     <div>
       <PageTitle />
       <div className={"main_container"}>
-        {/* <Date date={"December 1st"} /> */}
+        <ArticlesCategoryTitle articlesCategoryTitle={"Recent Top 10"} />
         <TableHeader />
-        {props.stories.map((story, i) => (
+        {props.japaneseTopStoriesDetails.map((japaneseTopStoryDetail) => (
           <DayTitleAndPoints
-            key={`story-list-${i}`}
-            dayTitle={story.title}
-            dayPoints={story.score}
-            id={story.id}
+            key={`japaneseStoryDetail-list-${japaneseTopStoryDetail.id}`}
+            dayTitle={japaneseTopStoryDetail.title}
+            dayPoints={japaneseTopStoryDetail.score}
+            id={japaneseTopStoryDetail.id}
           />
         ))}
+        <PageDescription />
       </div>
     </div>
   );
 };
 
-export default Allpage;
+export default AllPage;

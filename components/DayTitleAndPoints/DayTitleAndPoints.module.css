@@ -1,13 +1,22 @@
 .dayTitleAndPoints {
+  background-color: #ffffff;
+  box-shadow: 2px 2px 4px #8d7e6faf;
+  -webkit-box-shadow: 0 0 8px #8d7e6faf(0, 0, 0, 0.1);
+  -moz-box-shadow: 0 0 8px #8d7e6faf(0, 0, 0, 0.1);
   display: flex;
   justify-content: flex-start;
   width: 100%;
+  margin-bottom: 1rem;
 }
 
 .dayTitle {
-  width: 80%;
+  width: 85%;
+  padding: 0 1rem 0;
+  color: #612652;
 }
 
 .dayPoints {
-  width: 20%;
+  width: 15%;
+  padding: 0 1rem 0;
+  color: #612652;
 }
