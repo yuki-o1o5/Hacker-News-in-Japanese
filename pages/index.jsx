@@ -1,12 +1,11 @@
-
-import PageTitle from "../../components/PageTitle/PageTitle.jsx";
-import ArticlesCategoryTitle from "../../components/ArticlesCategoryTitle/ArticlesCategoryTitle.jsx";
-import TableHeader from "../../components/TableHeader/TableHeader.jsx";
-import DayTitleAndPoints from "../../components/DayTitleAndPoints/DayTitleAndPoints.jsx";
-import PageDescription from "../../components/PageDescription/PageDescription.jsx";
-import { getStoryDetail } from "../../helpers/hackerNews/storyDetail";
-import { translateStoryDetail } from "../../helpers/deepl/translateStoryDetail";
-import { JA } from "../../constants/deepl";
+import PageTitle from "../components/PageTitle/PageTitle.jsx";
+import ArticlesCategoryTitle from "../components/ArticlesCategoryTitle/ArticlesCategoryTitle.jsx";
+import TableHeader from "../components/TableHeader/TableHeader.jsx";
+import DayTitleAndPoints from "../components/DayTitleAndPoints/DayTitleAndPoints.jsx";
+import PageDescription from "../components/PageDescription/PageDescription.jsx";
+import { getStoryDetail } from "../helpers/hackerNews/storyDetail";
+import { translateStoryDetail } from "../helpers/deepl/translateStoryDetail";
+import { JA } from "../constants/deepl";
 
 export async function getServerSideProps() {
   let topStoriesIds = [];
