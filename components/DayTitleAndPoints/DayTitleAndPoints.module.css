@@ -20,3 +20,9 @@
   padding: 0 1rem 0;
   color: #612652;
 }
+
+@media screen and (max-width: 768px) {
+  .dayTitleAndPoints {
+    font-size: 0.8rem;
+  }
+}

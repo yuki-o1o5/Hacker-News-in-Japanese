@@ -17,3 +17,13 @@
   margin-bottom: 1rem;
   color: #612652a7;
 }
+
+@media screen and (max-width: 768px) {
+  .detailArticleCommentParent {
+    font-size: 0.8rem;
+  }
+
+  .detailArticleCommentChild {
+    font-size: 0.8rem;
+  }
+}
