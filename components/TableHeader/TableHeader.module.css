@@ -13,3 +13,9 @@
   width: 15%;
   color: #8d7e6f;
 }
+
+@media screen and (max-width: 768px) {
+  .tableHeader {
+    font-size: 0.8rem;
+  }
+}

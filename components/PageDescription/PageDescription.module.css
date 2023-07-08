@@ -1,8 +1,14 @@
 .pageDescription {
   margin-top: 3rem;
-  font-size: 1rem;
   color: #8d7e6f;
 }
-.pageDescription a{
+.pageDescription a {
   text-decoration-line: underline;
+}
+
+@media screen and (max-width: 768px) {
+  .pageDescription {
+    font-size: 0.8rem;
+    margin-top: 2rem;
+  }
 }

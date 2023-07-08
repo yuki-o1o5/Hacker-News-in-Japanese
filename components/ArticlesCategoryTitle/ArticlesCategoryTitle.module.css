@@ -3,3 +3,9 @@
   margin-top: 0;
   color: #612652;
 }
+
+@media screen and (max-width: 768px) {
+  .articlesCategoryTitle {
+    font-size: 1rem;
+  }
+}

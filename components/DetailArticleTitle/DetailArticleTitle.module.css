@@ -3,3 +3,9 @@
   margin: 0 0 0.5rem 0;
   color: #612652;
 }
+
+@media screen and (max-width: 768px) {
+  .detailArticleTitle {
+    font-size: 1rem;
+  }
+}
