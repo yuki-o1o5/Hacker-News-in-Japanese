@@ -7,7 +7,7 @@ import { getStoryDetail } from "../helpers/hackerNews/storyDetail";
 import { translateStoryDetail } from "../helpers/deepl/translateStoryDetail";
 import { JA } from "../constants/deepl";
 
-export async function getServerSideProps() {
+export async function getStaticProps() {
   let topStoriesIds = [];
   try {
     const getTopStoriesIdsRes = await fetch(
@@ -37,6 +37,7 @@ export async function getServerSideProps() {
 
   return {
     props: { japaneseTopStoriesDetails },
+    revalidate: 60 * 60, // Revalidate every 60 minutes
   };
 }
 

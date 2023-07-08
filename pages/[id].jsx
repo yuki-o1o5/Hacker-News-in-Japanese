@@ -9,8 +9,8 @@ import { translateCommentDetail } from "../helpers/deepl/translateCommentDetail.
 import { JA } from "../constants/deepl.js";
 import styles from "./index.module.css";
 
-export async function getServerSideProps(context) {
-  const storyId = context.query.id;
+export async function getStaticProps({ params }) {
+  const storyId = params.id;
   const storyDetail = await getStoryDetail(storyId);
 
   const firstCommentDetail = storyDetail.kids?.length
@@ -48,6 +48,7 @@ export async function getServerSideProps(context) {
         japaneseFirstCommentDetail,
         japaneseFirstCommentReplies,
       },
+      revalidate: 60 * 60, // Regenerate the page every hour
     };
   } catch (e) {
     return {
@@ -56,8 +57,16 @@ export async function getServerSideProps(context) {
         japaneseFirstCommentDetail: {},
         japaneseFirstCommentReplies: [],
       },
+      revalidate: 60 * 60,
     };
   }
+}
+
+export async function getStaticPaths() {
+  return {
+    paths: [],
+    fallback: "blocking",
+  };
 }
 
 const DetailPage = ({
@@ -106,7 +115,7 @@ const DetailPage = ({
                     detailArticleCategoryTitle={"Replies to Top Comment"}
                   />
                   {japaneseFirstCommentReplies.map((rep) => (
-                    <div
+                    <div 
                       key={rep.id}
                       className={styles.detailArticleCommentChild}
                       dangerouslySetInnerHTML={{ __html: rep.text }}
